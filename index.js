@@ -46,6 +46,7 @@ TrendnetMusicSwitch.prototype.getState = function (callback) {
 }
 
 TrendnetMusicSwitch.prototype.setState = function (toggle, callback, context) {
+  var callbacked = false;
   var path = '/eng/music_control.cgi?command=play&shuffleOn=1';
   if (!toggle) {
     path = '/eng/music_control.cgi?command=stop';
@@ -58,14 +59,20 @@ TrendnetMusicSwitch.prototype.setState = function (toggle, callback, context) {
   }, function (res) {
     res.on('data', function (data) {
       console.log("request ok");
-      //callback(null);
+      //console.log(data.toString());
+      if (!callbacked) {
+        callbacked = true;
+        callback(null);
+      }
     });
     res.on('error', function (err) {
       console.log('oh noes');
-      //callback(err);
+      if (!callbacked) {
+        callbacked = true;
+        callback(err);
+      }
     });
   });
-  callback(null);
 }
 
 TrendnetMusicSwitch.prototype.getServices = function () {
