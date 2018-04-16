@@ -1,0 +1,23 @@
+{
+  "name": "homebridge-trendnet-babycam",
+  "version": "0.0.1",
+  "description": "TRENDnet Baby Cam plugin for Homebridge: https://github.com/nfarina/homebridge",
+  "license": "ISC",
+  "keywords": [
+    "homebridge-plugin"
+  ],
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.2.0"
+  },
+  "author": {
+    "name": "Alberto Rojas"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rudders/homebridge-http.git"
+  },
+  "dependencies": {
+    "request": "^2.65.0"
+  }
+}
