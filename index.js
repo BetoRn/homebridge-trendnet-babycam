@@ -42,7 +42,42 @@ function TrendnetMusicSwitch(log, config) {
 }
 
 TrendnetMusicSwitch.prototype.getState = function (callback) {
-  callback(null, false)
+
+  var digest = require('http-digest-client')('raspi', 'raspi');
+  digest.request({
+    host: '192.168.100.24',
+    path: '/cgi/web_event.cgi',
+    port: 80,
+    method: 'GET',
+    headers: { "User-Agent": "IP Camera Viewer" } // Set any headers you want
+  }, function (response) {
+    var body = '';
+    var i = 0;
+    response.on('data', function (data) {
+      i++;
+      ///console.log("chunk received :" + i.toString());
+      //console.log(data.toString());
+      body += data.toString();
+      if (i >= 10) {
+        //console.log('destroying...');
+        response.destroy();
+      }
+    });
+
+    response.on('end', function (err) {
+
+      var state = false;
+      if (body.indexOf("playing_music=on") > 0)
+        state = true;
+      callback(null, state)
+      
+      console.log(body);
+    });
+
+    response.on('error', function (err) {
+      console.log('oh noes');
+    });
+  });
 }
 
 TrendnetMusicSwitch.prototype.setState = function (toggle, callback, context) {
