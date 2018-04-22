@@ -6,7 +6,7 @@ module.exports = function (homebridge) {
 
   homebridge.registerPlatform("homebridge-trendnet-babycam", "TrendnetBabyCam", TrendnetPlatform);
   homebridge.registerAccessory("homebridge-trendnet-babycam", "TrendnetBabyCamSwitch", TrendnetMusicSwitch);
-  //homebridge.registerAccessory("homebridge-trendnet-babycam", "TrendnetBabyCam", TrendnetTemp);
+  homebridge.registerAccessory("homebridge-trendnet-babycam", "TrendnetBabyCam", TrendnetTemp);
 };
 
 function TrendnetPlatform(log, config) {
@@ -20,6 +20,9 @@ TrendnetPlatform.prototype = {
     var accessories = [];
     var switchAccessory = new TrendnetMusicSwitch(this.log, this.config);
     accessories.push(switchAccessory);
+
+    var tempAccessory = new TrendnetTemp(this.log, this.config);
+    accessories.push(tempAccessory);
 
     callback(accessories);
     this.log("platform loaded.")
@@ -42,10 +45,8 @@ function TrendnetMusicSwitch(log, config) {
 }
 
 TrendnetMusicSwitch.prototype.getState = function (callback) {
-
-  var digest = require('http-digest-client')('raspi', 'raspi');
-  digest.request({
-    host: '192.168.100.24',
+  this.digest.request({
+    host: this.host,
     path: '/cgi/web_event.cgi',
     port: 80,
     method: 'GET',
@@ -70,8 +71,8 @@ TrendnetMusicSwitch.prototype.getState = function (callback) {
       if (body.indexOf("playing_music=on") > 0)
         state = true;
       callback(null, state)
-      
-      console.log(body);
+
+      //console.log(body);
     });
 
     response.on('error', function (err) {
@@ -101,7 +102,7 @@ TrendnetMusicSwitch.prototype.setState = function (toggle, callback, context) {
       }
     });
     res.on('error', function (err) {
-      console.log('oh noes');
+      console.log('oh shit');
       if (!callbacked) {
         callbacked = true;
         callback(err);
@@ -111,5 +112,65 @@ TrendnetMusicSwitch.prototype.setState = function (toggle, callback, context) {
 }
 
 TrendnetMusicSwitch.prototype.getServices = function () {
+  return [this.service];
+}
+
+function TrendnetTemp(log, config) {
+  this.log = log;
+  this.password = config["password"];
+  this.username = config["username"];
+  this.host = config["host"];
+  this.name = "TrendnetTemp";
+
+  this.digest = require('http-digest-client')(this.username, this.password);
+
+  this.service = new Service.TemperatureSensor(this.name);
+  this.service.getCharacteristic(Characteristic.CurrentTemperature)
+    .on('get', this.getState.bind(this));
+}
+
+TrendnetTemp.prototype.getState = function (callback) {
+  this.digest.request({
+    host: this.host,
+    path: '/cgi/web_event.cgi',
+    port: 80,
+    method: 'GET',
+    headers: { "User-Agent": "IP Camera Viewer" } // Set any headers you want
+  }, function (response) {
+    var body = '';
+    var i = 0;
+    response.on('data', function (data) {
+      i++;
+      ///console.log("chunk received :" + i.toString());
+      //console.log(data.toString());
+      body += data.toString();
+      if (i >= 10) {
+        //console.log('destroying...');
+        response.destroy();
+      }
+    });
+
+    response.on('end', function (err) {
+
+      var state = false;
+      var index = body.indexOf("tdC=");
+      if (index > 0) {
+        var tempC = body.substring(index, 2);
+        console.log("temp:" + tempC);
+        callback(null, parseFloat(tempC));
+      }
+      else {
+        callback("tempnotfound");
+      }
+    });
+
+    response.on('error', function (err) {
+      console.log('oh noes');
+      callback(err);
+    });
+  });
+}
+
+TrendnetTemp.prototype.getServices = function () {
   return [this.service];
 }
