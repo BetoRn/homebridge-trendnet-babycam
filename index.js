@@ -144,7 +144,7 @@ TrendnetTemp.prototype.getState = function (callback) {
       ///console.log("chunk received :" + i.toString());
       //console.log(data.toString());
       body += data.toString();
-      if (i >= 10) {
+      if (i >= 20) {
         //console.log('destroying...');
         response.destroy();
       }
