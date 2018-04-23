@@ -53,14 +53,11 @@ TrendnetMusicSwitch.prototype.getState = function (callback) {
     headers: { "User-Agent": "IP Camera Viewer" } // Set any headers you want
   }, function (response) {
     var body = '';
-    var i = 0;
     response.on('data', function (data) {
-      i++;
       ///console.log("chunk received :" + i.toString());
       //console.log(data.toString());
       body += data.toString();
-      if (i >= 10) {
-        //console.log('destroying...');
+      if (body.indexOf('playing_music=') > 0) {
         response.destroy();
       }
     });
@@ -138,13 +135,14 @@ TrendnetTemp.prototype.getState = function (callback) {
     headers: { "User-Agent": "IP Camera Viewer" } // Set any headers you want
   }, function (response) {
     var body = '';
-    var i = 0;
     response.on('data', function (data) {
-      i++;
       ///console.log("chunk received :" + i.toString());
       //console.log(data.toString());
       body += data.toString();
-      if (i >= 20) {
+      var index = 0;
+      index = body.indexOf('tdC=');
+      if (index > 0) {
+        console.log('foud Temp at' + index.toString())
         //console.log('destroying...');
         response.destroy();
       }
@@ -153,11 +151,14 @@ TrendnetTemp.prototype.getState = function (callback) {
     response.on('end', function (err) {
 
       var state = false;
-      var index = body.indexOf("tdC=");
+      console.log(body);
+      var index = body.indexOf('tdC=');
       if (index > 0) {
-        var tempC = body.substring(index, 2);
+        var tempC = body.substring(index + 4, index + 6);
         console.log("temp:" + tempC);
-        callback(null, parseFloat(tempC));
+        var theTemp = parseFloat(tempC);
+        theTemp -= 4;
+        callback(null, theTemp);
       }
       else {
         callback("tempnotfound");
