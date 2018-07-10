@@ -6,7 +6,7 @@ module.exports = function (homebridge) {
 
   homebridge.registerPlatform("homebridge-trendnet-babycam", "TrendnetBabyCam", TrendnetPlatform);
   homebridge.registerAccessory("homebridge-trendnet-babycam", "TrendnetBabyCamSwitch", TrendnetMusicSwitch);
-  homebridge.registerAccessory("homebridge-trendnet-babycam", "TrendnetBabyCam", TrendnetTemp);
+  homebridge.registerAccessory("homebridge-trendnet-babycam", "TrendnetBabyCamTemp", TrendnetTemp);
 };
 
 function TrendnetPlatform(log, config) {
@@ -68,19 +68,17 @@ TrendnetMusicSwitch.prototype.getState = function (callback) {
       if (body.indexOf("playing_music=on") > 0)
         state = true;
       callback(null, state)
-
-      //console.log(body);
-    });
+        });
 
     response.on('error', function (err) {
-      console.log('oh noes');
+      console.log('error');
     });
   });
 }
 
 TrendnetMusicSwitch.prototype.setState = function (toggle, callback, context) {
   var callbacked = false;
-  var path = '/eng/music_control.cgi?command=play&shuffleOn=1';
+  var path = '/eng/music_control.cgi?command=play&shuffleOn=1&repeatOn=1';
   if (!toggle) {
     path = '/eng/music_control.cgi?command=stop';
   }
@@ -99,7 +97,7 @@ TrendnetMusicSwitch.prototype.setState = function (toggle, callback, context) {
       }
     });
     res.on('error', function (err) {
-      console.log('oh shit');
+      console.log('error');
       if (!callbacked) {
         callbacked = true;
         callback(err);
@@ -142,16 +140,15 @@ TrendnetTemp.prototype.getState = function (callback) {
       var index = 0;
       index = body.indexOf('tdC=');
       if (index > 0) {
-        console.log('foud Temp at' + index.toString())
+        //console.log('foud Temp at' + index.toString())
         //console.log('destroying...');
         response.destroy();
       }
     });
 
     response.on('end', function (err) {
-
       var state = false;
-      console.log(body);
+      //console.log(body);
       var index = body.indexOf('tdC=');
       if (index > 0) {
         var tempC = body.substring(index + 4, index + 6);
@@ -166,7 +163,7 @@ TrendnetTemp.prototype.getState = function (callback) {
     });
 
     response.on('error', function (err) {
-      console.log('oh noes');
+      console.log('error');
       callback(err);
     });
   });
