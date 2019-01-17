@@ -2,7 +2,7 @@
 
 TRENDnet Baby Cam plugin for [Homebridge](https://github.com/nfarina/homebridge) 
 
-Creates a Switch for that starts/stops the pre-installed lullabies and a temperature sensor
+Creates a Switch for that starts/stops the music from the SD card and a temperature sensor
 
 ## Configuration
 

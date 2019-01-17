@@ -189,5 +189,5 @@ TrendnetTemp.prototype.getState = function (callback) {
 }
 
 TrendnetTemp.prototype.getServices = function () {
-  return [this.service];
+  return [tempService];
 }
