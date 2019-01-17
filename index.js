@@ -1,4 +1,5 @@
 var Service, Characteristic;
+var tempService;
 
 module.exports = function (homebridge) {
   Service = homebridge.hap.Service;
@@ -78,7 +79,7 @@ TrendnetMusicSwitch.prototype.getState = function (callback) {
 
 TrendnetMusicSwitch.prototype.setState = function (toggle, callback, context) {
   var callbacked = false;
-  var path = '/eng/music_control.cgi?command=play&shuffleOn=1&repeatOn=1';
+  var path = '/eng/music_control.cgi?command=play&shuffleOn=1&repeatOn=1&musicFrom=2';
   if (!toggle) {
     path = '/eng/music_control.cgi?command=stop';
   }
@@ -119,9 +120,27 @@ function TrendnetTemp(log, config) {
 
   this.digest = require('http-digest-client')(this.username, this.password);
 
-  this.service = new Service.TemperatureSensor(this.name);
-  this.service.getCharacteristic(Characteristic.CurrentTemperature)
-    .on('get', this.getState.bind(this));
+  tempService = new Service.TemperatureSensor(this.name);
+  tempService.getCharacteristic(Characteristic.CurrentTemperature).on('get', this.getState.bind(this));
+
+  var self = this;
+  setTimeout(function () {
+      self.backgroundPolling();
+  }, 5 * 60 * 1000);
+}
+
+TrendnetTemp.prototype.backgroundPolling = function () {
+  console.log("polling...");
+  this.getState(function (error, temp) {
+      if (!error && temp != null) {
+          tempService.setCharacteristic(Characteristic.CurrentTemperature, temp);
+      }
+  }.bind(this));
+
+  var self = this;
+  setTimeout(function () {
+      self.backgroundPolling();
+  }, 5 * 60 * 1000);
 }
 
 TrendnetTemp.prototype.getState = function (callback) {
