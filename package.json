@@ -1,6 +1,6 @@
 {
   "name": "homebridge-trendnet-babycam",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "TRENDnet Baby Cam plugin for Homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
