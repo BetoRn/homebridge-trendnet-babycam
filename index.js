@@ -1,9 +1,10 @@
-var Service, Characteristic;
+var Service, Characteristic, FakeGatoHistoryService;
 var tempService;
 
 module.exports = function (homebridge) {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
+  FakeGatoHistoryService = require("fakegato-history")(homebridge);
 
   homebridge.registerPlatform("homebridge-trendnet-babycam", "TrendnetBabyCam", TrendnetPlatform);
   homebridge.registerAccessory("homebridge-trendnet-babycam", "TrendnetBabyCamSwitch", TrendnetMusicSwitch);
@@ -117,6 +118,15 @@ function TrendnetTemp(log, config) {
   this.username = config["username"];
   this.host = config["host"];
   this.name = "TrendnetTemp";
+  this.fakeGatoHistoryService = undefined;
+  if (config["enableHistory"] != null){
+      this.enableHistory = config["enableHistory"];
+  } else {
+     this.enableHistory = false;
+  }
+  if (this.enableHistory) {
+     this.fakeGatoHistoryService = new FakeGatoHistoryService("weather", this, 4032)
+  }
 
   this.digest = require('http-digest-client')(this.username, this.password);
 
@@ -134,6 +144,12 @@ TrendnetTemp.prototype.backgroundPolling = function () {
   this.getState(function (error, temp) {
       if (!error && temp != null) {
           tempService.setCharacteristic(Characteristic.CurrentTemperature, temp);
+          if (this.enableHistory && this.fakeGatoHistoryService) {
+             this.fakeGatoHistoryService.addEntry({
+                time: new Date().getTime() / 1000,
+                temp: temp
+             });
+          }
       }
   }.bind(this));
 
