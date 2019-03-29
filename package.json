@@ -1,6 +1,6 @@
 {
   "name": "homebridge-trendnet-babycam",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "TRENDnet Baby Cam plugin for Homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
@@ -18,7 +18,7 @@
   "dependencies": {
     "request": "^2.65.0",
     "http-digest-client": "0.0.3",
-    "fakegato-history": "^0.5.1",
+    "fakegato-history": "^0.5.1"
   },
   "bugs": {
     "url": "https://github.com/BetoRn/homebridge-trendnet-babycam/issues"
