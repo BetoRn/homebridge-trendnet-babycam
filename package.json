@@ -17,16 +17,15 @@
   },
   "dependencies": {
     "request": "^2.65.0",
-    "http-digest-client": "0.0.3"
+    "http-digest-client": "0.0.3",
+    "fakegato-history": "^0.5.1",
   },
   "bugs": {
     "url": "https://github.com/BetoRn/homebridge-trendnet-babycam/issues"
   },
   "homepage": "https://github.com/BetoRn/homebridge-trendnet-babycam#readme",
   "main": "index.js",
-  "devDependencies": {
-     "fakegato-history": "^0.5.1",
-  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   }
