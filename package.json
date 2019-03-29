@@ -1,6 +1,6 @@
 {
   "name": "homebridge-trendnet-babycam",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "TRENDnet Baby Cam plugin for Homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/BetoRn/homebridge-trendnet-babycam#readme",
   "main": "index.js",
-  "devDependencies": {},
+  "devDependencies": {
+     "fakegato-history": "^0.5.1",
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   }
