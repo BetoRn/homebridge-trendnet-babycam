@@ -1,5 +1,4 @@
 var Service, Characteristic, FakeGatoHistoryService;
-var tempService;
 
 module.exports = function (homebridge) {
   Service = homebridge.hap.Service;
@@ -130,8 +129,14 @@ function TrendnetTemp(log, config) {
 
   this.digest = require('http-digest-client')(this.username, this.password);
 
-  tempService = new Service.TemperatureSensor(this.name);
-  tempService.getCharacteristic(Characteristic.CurrentTemperature).on('get', this.getState.bind(this));
+  this.tempService = new Service.TemperatureSensor(this.name);
+  this.tempService.getCharacteristic(Characteristic.CurrentTemperature).on('get', this.getState.bind(this));
+
+  this.services = [this.tempService];
+  if (this.enableHistory) {
+      this.log("adding fakegato service");
+     this.services[this.services.length] = this.fakeGatoHistoryService;
+  }
 
   var self = this;
   setTimeout(function () {
@@ -143,8 +148,9 @@ TrendnetTemp.prototype.backgroundPolling = function () {
   console.log("polling...");
   this.getState(function (error, temp) {
       if (!error && temp != null) {
-          tempService.setCharacteristic(Characteristic.CurrentTemperature, temp);
+          this.tempService.setCharacteristic(Characteristic.CurrentTemperature, temp);
           if (this.enableHistory && this.fakeGatoHistoryService) {
+             this.log("updating fakegato");
              this.fakeGatoHistoryService.addEntry({
                 time: new Date().getTime() / 1000,
                 temp: temp
@@ -205,5 +211,5 @@ TrendnetTemp.prototype.getState = function (callback) {
 }
 
 TrendnetTemp.prototype.getServices = function () {
-  return [tempService];
+  return this.services;
 }
