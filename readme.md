@@ -13,8 +13,10 @@ Example:
 	        "platform": "TrendnetBabyCam",
 	        "host": "192.168.100.24",
 	        "username": "your-username",
-	        "password": "your-password"
+	        "password": "your-password",
+		"enableHistory": true
         },
     ]
 
 
+enableHistory: enables the FakeGato-service used to log temperature. This doesn't work with the default Home-App, you have to use the Elgato Eve App.
